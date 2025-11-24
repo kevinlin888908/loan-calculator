@@ -1,4 +1,4 @@
-loan calculator my-app 
+loan calculator my-app William 168
 好的！讓我幫您將專案推送到 GitHub。我們需要先設定遠端儲存庫，然後推送程式碼。
 
 **1. 首先檢查當前的 Git 狀態：**
