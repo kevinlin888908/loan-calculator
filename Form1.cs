@@ -115,21 +115,29 @@ namespace loan
         }
         
         /// <summary>
-        /// 新增範例事件用於展示
+        /// 新增範例事件用於展示 ?? 幸運版本
         /// </summary>
         private void AddSampleEvents()
         {
             var sampleEvents = new List<CalendarEvent>
             {
-                new CalendarEvent("房東簽約", "房東一月三號下午三點要簽約", new DateTime(2024, 1, 3, 15, 0, 0)),
-                new CalendarEvent("醫生檢查", "例行健康檢查", DateTime.Today.AddDays(1).AddHours(10)),
-                new CalendarEvent("會議", "專案進度會議", DateTime.Today.AddDays(3).AddHours(14))
+                new CalendarEvent("房東簽約 ??", "房東一月三號下午三點要簽約 - 祝簽約順利發財！", new DateTime(2024, 1, 3, 15, 0, 0)),
+                new CalendarEvent("醫生檢查 ?", "例行健康檢查 - 身體健康最重要！", DateTime.Today.AddDays(1).AddHours(10)),
+                new CalendarEvent("發財會議 ??", "專案進度會議 - 討論如何賺大錢！", DateTime.Today.AddDays(3).AddHours(14)),
+                new CalendarEvent("幸運日 ??", "今天是發發發的好日子！", new DateTime(2024, 8, 8, 8, 8, 0)),
+                new CalendarEvent("一路發 ??", "重要商務會議 - 一路發發發！", new DateTime(2024, 1, 18, 16, 8, 0))
             };
 
             foreach (var evt in sampleEvents)
             {
                 evt.Id = nextEventId++;
                 events.Add(evt);
+                
+                // 顯示幸運資訊 ??
+                if (evt.IsLuckyDate())
+                {
+                    System.Diagnostics.Debug.WriteLine($"?? 幸運事件：{evt.Title} - {evt.GetLuckyAdvice()}");
+                }
             }
             
             RefreshEventList();
@@ -316,11 +324,20 @@ namespace loan
         {
             if (selectedEvent != null)
             {
-                lblEventDetails.Text = selectedEvent.GetDetailedInfo();
+                var detailText = selectedEvent.GetDetailedInfo();
+                
+                // 加入幸運資訊 ??
+                if (selectedEvent.IsLuckyDate())
+                {
+                    detailText += $"\n\n?? 幸運指數：{selectedEvent.GetLuckyScore()} 分";
+                    detailText += $"\n?? 幸運建議：{selectedEvent.GetLuckyAdvice()}";
+                }
+                
+                lblEventDetails.Text = detailText;
             }
             else
             {
-                lblEventDetails.Text = "請選擇一個事件查看詳細資訊";
+                lblEventDetails.Text = "請選擇一個事件查看詳細資訊\n\n?? 創造自己的幸運！888！";
             }
         }
 
