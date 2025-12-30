@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="CalendarMauiMobile.MainPage"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             Title="?? 行事曆管理 - 發發發版"
+             BackgroundColor="#F8F9FA">
+
+    <Shell.TitleView>
+        <Grid BackgroundColor="#4A90E2">
+            <Label Text="?? 【行事曆】管理系統 888"
+                   FontSize="18"
+                   FontAttributes="Bold"
+                   TextColor="White"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center" />
+        </Grid>
+    </Shell.TitleView>
+
+    <ScrollView>
+        <StackLayout Padding="15" Spacing="20">
+
+            <!-- 幸運提示卡片 -->
+            <Frame BackgroundColor="#E8F6E8" 
+                   BorderColor="#4CAF50"
+                   CornerRadius="12"
+                   Padding="15"
+                   HasShadow="True">
+                <StackLayout Orientation="Horizontal" Spacing="10">
+                    <Label Text="??"
+                           FontSize="24"
+                           VerticalOptions="Center" />
+                    <StackLayout>
+                        <Label Text="今日幸運指數"
+                               FontSize="14"
+                               FontAttributes="Bold"
+                               TextColor="#2E7D32" />
+                        <Label x:Name="LuckyAdviceLabel"
+                               Text="?? 創造自己的幸運！888！"
+                               FontSize="12"
+                               TextColor="#4CAF50" />
+                    </StackLayout>
+                </StackLayout>
+            </Frame>
+
+            <!-- 快捷操作按鈕 -->
+            <Grid ColumnDefinitions="*,*,*" ColumnSpacing="10">
+                <Button Grid.Column="0"
+                        Text="?? 今天"
+                        BackgroundColor="#2196F3"
+                        TextColor="White"
+                        CornerRadius="8"
+                        Clicked="OnTodayClicked" />
+                        
+                <Button Grid.Column="1"
+                        Text="? 新增"
+                        BackgroundColor="#4CAF50"
+                        TextColor="White"
+                        CornerRadius="8"
+                        Clicked="OnAddEventClicked" />
+                        
+                <Button Grid.Column="2"
+                        Text="?? 幸運"
+                        BackgroundColor="#FF9800"
+                        TextColor="White"
+                        CornerRadius="8"
+                        Clicked="OnLuckyEventsClicked" />
+            </Grid>
+
+            <!-- 日期選擇器 -->
+            <Frame BackgroundColor="White" 
+                   CornerRadius="12"
+                   Padding="15"
+                   HasShadow="True">
+                <StackLayout>
+                    <Label Text="?? 選擇日期"
+                           FontSize="16"
+                           FontAttributes="Bold"
+                           TextColor="#333333" />
+                    <DatePicker x:Name="EventDatePicker"
+                              Date="{Binding SelectedDate}"
+                              DateSelected="OnDateSelected"
+                              FontSize="16"
+                              BackgroundColor="Transparent" />
+                </StackLayout>
+            </Frame>
+
+            <!-- 當日事件統計 -->
+            <Frame BackgroundColor="#FFF3E0"
+                   BorderColor="#FF9800"
+                   CornerRadius="12"
+                   Padding="15"
+                   HasShadow="True">
+                <StackLayout Orientation="Horizontal" Spacing="10">
+                    <Label Text="??"
+                           FontSize="20"
+                           VerticalOptions="Center" />
+                    <StackLayout>
+                        <Label x:Name="DateEventCountLabel"
+                               Text="今天沒有事件安排"
+                               FontSize="14"
+                               FontAttributes="Bold"
+                               TextColor="#F57C00" />
+                        <Label x:Name="DateEventsDetailsLabel"
+                               Text="選擇日期查看事件詳情"
+                               FontSize="12"
+                               TextColor="#FF9800" />
+                    </StackLayout>
+                </StackLayout>
+            </Frame>
+
+            <!-- 事件列表 -->
+            <Frame BackgroundColor="White"
+                   CornerRadius="12"
+                   Padding="0"
+                   HasShadow="True">
+                <StackLayout>
+                    <Label Text="?? 事件列表"
+                           FontSize="16"
+                           FontAttributes="Bold"
+                           TextColor="#333333"
+                           Margin="15,15,15,0" />
+                           
+                    <CollectionView x:Name="EventsCollectionView"
+                                  ItemsSource="{Binding FilteredEvents}"
+                                  EmptyView="?? 沒有事件，來創造一些精彩的計畫吧！"
+                                  Margin="15,10,15,15"
+                                  SelectionMode="Single"
+                                  SelectionChanged="OnEventSelected">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Padding="0,5">
+                                    <SwipeView>
+                                        <!-- 滑動操作 -->
+                                        <SwipeView.RightItems>
+                                            <SwipeItems>
+                                                <SwipeItem Text="編輯"
+                                                         BackgroundColor="#4CAF50"
+                                                         CommandParameter="{Binding .}"
+                                                         Invoked="OnEditEventSwipe" />
+                                                <SwipeItem Text="刪除"
+                                                         BackgroundColor="#F44336"
+                                                         CommandParameter="{Binding .}"
+                                                         Invoked="OnDeleteEventSwipe" />
+                                            </SwipeItems>
+                                        </SwipeView.RightItems>
+                                        
+                                        <!-- 事件卡片 -->
+                                        <Frame BackgroundColor="{Binding IsLucky, Converter={StaticResource LuckyToColorConverter}}"
+                                               CornerRadius="8"
+                                               Padding="15"
+                                               Margin="0,2"
+                                               HasShadow="False"
+                                               BorderColor="{Binding IsLucky, Converter={StaticResource LuckyToBorderConverter}}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto" />
+                                                    <RowDefinition Height="Auto" />
+                                                </Grid.RowDefinitions>
+                                                
+                                                <!-- 時間 -->
+                                                <StackLayout Grid.Column="0" Grid.RowSpan="2" 
+                                                           VerticalOptions="Center" 
+                                                           Margin="0,0,10,0">
+                                                    <Label Text="{Binding DateString}"
+                                                           FontSize="12"
+                                                           FontAttributes="Bold"
+                                                           TextColor="#666666"
+                                                           HorizontalOptions="Center" />
+                                                    <Label Text="{Binding TimeString}"
+                                                           FontSize="16"
+                                                           FontAttributes="Bold"
+                                                           TextColor="#2196F3"
+                                                           HorizontalOptions="Center" />
+                                                </StackLayout>
+                                                
+                                                <!-- 標題和內容 -->
+                                                <Label Grid.Column="1" Grid.Row="0"
+                                                       Text="{Binding Title}"
+                                                       FontSize="16"
+                                                       FontAttributes="Bold"
+                                                       TextColor="#333333"
+                                                       LineBreakMode="TailTruncation" />
+                                                       
+                                                <Label Grid.Column="1" Grid.Row="1"
+                                                       Text="{Binding Description}"
+                                                       FontSize="14"
+                                                       TextColor="#666666"
+                                                       LineBreakMode="TailTruncation"
+                                                       MaxLines="2"
+                                                       Margin="0,5,0,0" />
+                                                
+                                                <!-- 幸運指示器 -->
+                                                <StackLayout Grid.Column="2" Grid.RowSpan="2" 
+                                                           VerticalOptions="Center">
+                                                    <Label Text="{Binding IsLucky, Converter={StaticResource BoolToLuckyEmojiConverter}}"
+                                                           FontSize="20"
+                                                           HorizontalOptions="Center"
+                                                           IsVisible="{Binding IsLucky}" />
+                                                    <Label Text="{Binding LuckyScore}"
+                                                           FontSize="10"
+                                                           TextColor="#FF9800"
+                                                           HorizontalOptions="Center"
+                                                           IsVisible="{Binding IsLucky}" />
+                                                </StackLayout>
+                                            </Grid>
+                                        </Frame>
+                                    </SwipeView>
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </StackLayout>
+            </Frame>
+
+            <!-- 統計資訊 -->
+            <Frame BackgroundColor="#E3F2FD"
+                   BorderColor="#2196F3"
+                   CornerRadius="12"
+                   Padding="15"
+                   HasShadow="True">
+                <Grid ColumnDefinitions="*,*,*" ColumnSpacing="10">
+                    <StackLayout Grid.Column="0">
+                        <Label Text="??"
+                               FontSize="20"
+                               HorizontalOptions="Center" />
+                        <Label x:Name="TotalEventsLabel"
+                               Text="0"
+                               FontSize="16"
+                               FontAttributes="Bold"
+                               TextColor="#1976D2"
+                               HorizontalOptions="Center" />
+                        <Label Text="總事件"
+                               FontSize="12"
+                               TextColor="#1976D2"
+                               HorizontalOptions="Center" />
+                    </StackLayout>
+                    
+                    <StackLayout Grid.Column="1">
+                        <Label Text="??"
+                               FontSize="20"
+                               HorizontalOptions="Center" />
+                        <Label x:Name="LuckyEventsLabel"
+                               Text="0"
+                               FontSize="16"
+                               FontAttributes="Bold"
+                               TextColor="#4CAF50"
+                               HorizontalOptions="Center" />
+                        <Label Text="幸運事件"
+                               FontSize="12"
+                               TextColor="#4CAF50"
+                               HorizontalOptions="Center" />
+                    </StackLayout>
+                    
+                    <StackLayout Grid.Column="2">
+                        <Label Text="?"
+                               FontSize="20"
+                               HorizontalOptions="Center" />
+                        <Label x:Name="HighScoreLabel"
+                               Text="0"
+                               FontSize="16"
+                               FontAttributes="Bold"
+                               TextColor="#FF9800"
+                               HorizontalOptions="Center" />
+                        <Label Text="最高分"
+                               FontSize="12"
+                               TextColor="#FF9800"
+                               HorizontalOptions="Center" />
+                    </StackLayout>
+                </Grid>
+            </Frame>
+
+        </StackLayout>
+    </ScrollView>
+
+</ContentPage>

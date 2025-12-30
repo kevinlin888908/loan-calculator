@@ -8,4 +8,10 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <!-- 排除 MAUI 相關檔案 -->
+  <ItemGroup>
+    <Compile Remove="TempMauiFiles/**" />
+    <None Remove="TempMauiFiles/**" />
+  </ItemGroup>
+
 </Project>
